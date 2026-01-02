@@ -29,28 +29,21 @@ async fn main() {
         clear_background(BLACK);
         let dt = get_frame_time();
 
-        let mut forces = vec![(0.0, 0.0); circles.len()];
-        for i in 0..circles.len() {
-            for j in 0..circles.len() {
-                if i != j {
-                    let gravity = calculate_gravity(&circles[i].position, &circles[j].position);
-                    forces[i].0 += gravity.0;
-                    forces[i].1 += gravity.1;
-                }
-            }
-        }
-        for (i, c) in &mut circles.iter_mut().enumerate() {
+        for  c in &mut circles {
             c.position.0 += c.velocity.0 * dt;
             c.position.1 += c.velocity.1 * dt;
-            c.velocity.0 += forces[i].0;
-            c.velocity.1 += forces[i].1;
+            if is_mouse_button_down(MouseButton::Left) {
+                let g = calculate_gravity(&c.position, &mouse_position(), 5.0);
+                c.velocity.0 += g.0;
+                c.velocity.1 += g.1;
+            }
             draw_faded_circle(&c.position);
         }
         next_frame().await
     }
 }
 
-fn calculate_gravity(a: &(f32, f32), b: &(f32, f32)) -> (f32, f32) {
+fn calculate_gravity(a: &(f32, f32), b: &(f32, f32), weight: f32) -> (f32, f32) {
     let dist_x = a.0 - b.0;
     let dist_y = a.1 - b.1;
     let r = (dist_x * dist_x + dist_y * dist_y).sqrt();
@@ -58,8 +51,8 @@ fn calculate_gravity(a: &(f32, f32), b: &(f32, f32)) -> (f32, f32) {
     let strength = 1.0 / scaled_r * scaled_r;
     let x_normalized = dist_x / r;
     let y_normalized = dist_y / r;
-    let f_x = -strength * x_normalized;
-    let f_y = -strength * y_normalized;
+    let f_x = -strength * x_normalized * weight;
+    let f_y = -strength * y_normalized * weight;
     return (f_x, f_y);
 }
 fn draw_faded_circle(circle_position: &(f32, f32)) {
