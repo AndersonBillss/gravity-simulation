@@ -26,11 +26,22 @@ async fn main() {
             c.velocity.1 *= friction;
             draw_faded_circle(&c.position);
             if circle_out_of_bounds(&c.position) {
-                *c = random_circle();
+                c.position = reflect(&c.position);
             }
         }
         next_frame().await
     }
+}
+
+fn reflect(coords: &(f32, f32)) -> (f32, f32) {
+    let screen_dimensions = (screen_width(), screen_height());
+    let screen_mid = (screen_dimensions.0 / 2.0, screen_dimensions.1 / 2.0);
+    let adjusted_coords = (coords.0 - screen_mid.0, coords.1 - screen_mid.1);
+    let flipped_coords = (-adjusted_coords.0, -adjusted_coords.1);
+    return (
+        flipped_coords.0 + screen_mid.0,
+        flipped_coords.1 + screen_mid.1,
+    );
 }
 
 fn calculate_gravity(a: &(f32, f32), b: &(f32, f32), weight: f32) -> (f32, f32) {
