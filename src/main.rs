@@ -8,7 +8,8 @@ struct Circle {
 #[macroquad::main("Gravity Simulation")]
 async fn main() {
     println!("Hello, gravity simulation");
-    let mut circles: Vec<Circle> = (0..1000).map(|_| random_circle()).collect();
+    let mut circles: Vec<Circle> = (0..4000).map(|_| random_circle()).collect();
+    let circle_texture = create_soft_circle_texture();
     loop {
         clear_background(BLACK);
         let dt = get_frame_time();
@@ -24,7 +25,7 @@ async fn main() {
             let friction = 1.0 - 0.1 * dt;
             c.velocity.0 *= friction;
             c.velocity.1 *= friction;
-            draw_faded_circle(&c.position);
+            draw_faded_circle(&c.position, &circle_texture);
             if circle_out_of_bounds(&c.position) {
                 c.position = reflect(&c.position);
             }
@@ -87,40 +88,46 @@ fn random_circle() -> Circle {
     return circle;
 }
 
-fn draw_faded_circle(circle_position: &(f32, f32)) {
-    let orange_1 = ORANGE;
-    let orange_2: Color = Color { a: 0.8, ..ORANGE };
-    let orange_3: Color = Color { a: 0.4, ..ORANGE };
-    let orange_4: Color = Color { a: 0.2, ..ORANGE };
-    let orange_5: Color = Color { a: 0.1, ..ORANGE };
-    draw_circle(
-        circle_position.0,
-        circle_position.1,
-        CIRCLE_RADIUS * 0.125,
-        orange_1,
+fn draw_faded_circle(circle_position: &(f32, f32), texture: &Texture2D) {
+    draw_texture_ex(
+        &texture,
+        circle_position.0 - CIRCLE_RADIUS,
+        circle_position.1 - CIRCLE_RADIUS,
+        ORANGE,
+        DrawTextureParams {
+            dest_size: None,
+            source: None,
+            rotation: 0.0,
+            flip_x: false,
+            flip_y: false,
+            pivot: None,
+        },
     );
-    draw_circle(
-        circle_position.0,
-        circle_position.1,
-        CIRCLE_RADIUS * 0.25,
-        orange_2,
+}
+
+fn create_soft_circle_texture() -> Texture2D {
+    let image_dimensions: (u16, u16) = ((CIRCLE_RADIUS as u16) * 2, (CIRCLE_RADIUS as u16) * 2);
+    let mut image = Image::gen_image_color(
+        image_dimensions.0,
+        image_dimensions.1,
+        Color { a: 0.0, ..WHITE },
     );
-    draw_circle(
-        circle_position.0,
-        circle_position.1,
-        CIRCLE_RADIUS * 0.5,
-        orange_3,
-    );
-    draw_circle(
-        circle_position.0,
-        circle_position.1,
-        CIRCLE_RADIUS * 0.75,
-        orange_4,
-    );
-    draw_circle(
-        circle_position.0,
-        circle_position.1,
-        CIRCLE_RADIUS,
-        orange_5,
-    );
+    for i in 0..image_dimensions.0 {
+        for j in 0..image_dimensions.1 {
+            let i_adjusted = i as f32 - CIRCLE_RADIUS;
+            let j_adjusted = j as f32 - CIRCLE_RADIUS;
+            let distance_from_center = (i_adjusted * i_adjusted + j_adjusted * j_adjusted).sqrt();
+            image.set_pixel(
+                i as u32,
+                j as u32,
+                Color {
+                    a: 1.0 - ((distance_from_center * 2.0) / image_dimensions.0 as f32),
+                    ..WHITE
+                },
+            );
+        }
+    }
+    let tex = Texture2D::from_image(&image);
+    tex.set_filter(FilterMode::Linear);
+    tex
 }
