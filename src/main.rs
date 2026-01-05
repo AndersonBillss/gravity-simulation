@@ -1,7 +1,7 @@
 use macroquad::prelude::*;
 
 static CIRCLE_RADIUS: f32 = 8.0;
-static CIRCLE_COLOR: Color = RED;
+static CIRCLE_COLOR: Color = ORANGE;
 struct Circle {
     position: (f32, f32),
     velocity: (f32, f32),
