@@ -1,6 +1,12 @@
 use macroquad::prelude::*;
 
 static CIRCLE_RADIUS: f32 = 8.0;
+static CIRCLE_COLOR: Color = Color {
+    r: 0.0,
+    g: 1.0,
+    b: 1.0,
+    a: 1.0,
+};
 struct Circle {
     position: (f32, f32),
     velocity: (f32, f32),
@@ -93,7 +99,7 @@ fn draw_faded_circle(circle_position: &(f32, f32), texture: &Texture2D) {
         &texture,
         circle_position.0 - CIRCLE_RADIUS,
         circle_position.1 - CIRCLE_RADIUS,
-        ORANGE,
+        CIRCLE_COLOR,
         DrawTextureParams {
             dest_size: None,
             source: None,
