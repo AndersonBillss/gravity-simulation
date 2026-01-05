@@ -1,19 +1,13 @@
 use macroquad::prelude::*;
 
 static CIRCLE_RADIUS: f32 = 8.0;
-static CIRCLE_COLOR: Color = Color {
-    r: 0.0,
-    g: 1.0,
-    b: 1.0,
-    a: 1.0,
-};
+static CIRCLE_COLOR: Color = RED;
 struct Circle {
     position: (f32, f32),
     velocity: (f32, f32),
 }
 #[macroquad::main("Gravity Simulation")]
 async fn main() {
-    println!("Hello, gravity simulation");
     let mut circles: Vec<Circle> = (0..4000).map(|_| random_circle()).collect();
     let circle_texture = create_soft_circle_texture();
     loop {
