@@ -39,9 +39,30 @@ fn reflect(coords: &(f32, f32)) -> (f32, f32) {
     let screen_mid = (screen_dimensions.0 / 2.0, screen_dimensions.1 / 2.0);
     let adjusted_coords = (coords.0 - screen_mid.0, coords.1 - screen_mid.1);
     let flipped_coords = (-adjusted_coords.0, -adjusted_coords.1);
+
+    let slope_point_to_center = flipped_coords.1 / flipped_coords.0;
+    let slope_corner_to_corner = screen_dimensions.1 / screen_dimensions.0;
+
+    let in_bounds_coords: (f32, f32);
+    if slope_point_to_center.abs() > slope_corner_to_corner.abs() {
+        let mut y = screen_mid.1 + (CIRCLE_RADIUS - 1.0);
+        if flipped_coords.1 < 0.0 {
+            y = -y;
+        }
+        let scale_factor = y / flipped_coords.1;
+        in_bounds_coords = (flipped_coords.0 * scale_factor, y);
+    } else {
+        let mut x = screen_mid.0 + (CIRCLE_RADIUS - 1.0);
+        if flipped_coords.0 < 0.0 {
+            x = -x;
+        }
+        let scale_factor = x / flipped_coords.0;
+        in_bounds_coords = (x, flipped_coords.1 * scale_factor);
+    }
+
     return (
-        flipped_coords.0 + screen_mid.0,
-        flipped_coords.1 + screen_mid.1,
+        in_bounds_coords.0 + screen_mid.0,
+        in_bounds_coords.1 + screen_mid.1,
     );
 }
 
