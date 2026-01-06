@@ -26,6 +26,7 @@
     <script src="gl.js"></script>
     <script>
       load("./gravity-simulation.wasm");
+      document.getElementById("glcanvas").addEventListener("contextmenu", (e) => e.preventDefault());
     </script>
   </body>
 </html>

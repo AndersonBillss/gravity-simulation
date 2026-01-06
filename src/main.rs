@@ -21,6 +21,10 @@ async fn main() {
                 let g = calculate_gravity(&c.position, &mouse_position(), 5.0);
                 c.velocity.0 += g.0 * dt;
                 c.velocity.1 += g.1 * dt;
+            } else if is_mouse_button_down(MouseButton::Right) {
+                let g = calculate_gravity(&c.position, &mouse_position(), 5.0);
+                c.velocity.0 -= g.0 * dt;
+                c.velocity.1 -= g.1 * dt;
             }
             let friction = 1.0 - 0.1 * dt;
             c.velocity.0 *= friction;
